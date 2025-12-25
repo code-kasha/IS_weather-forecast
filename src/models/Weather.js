@@ -42,16 +42,33 @@ export class Weather {
 		this.heatIndexC = heatIndexC
 		this.heatIndexF = heatIndexF
 		this.uv = uv
+		this.unit = "C"
 	}
 
-	// Returns a formatted temperature string (Celsius)
+	// Toggles C and F
+	toggleUnit() {
+		this.unit = this.unit === "C" ? "F" : "C"
+	}
+
+	// Returns Formated Temperature
 	getTemperature() {
-		return `${Math.round(this.tempC)}°C`
+		return this.unit === "C"
+			? `${Math.round(this.tempC)}°C`
+			: `${Math.round(this.tempF)}°F`
 	}
 
-	// Returns a formatted temperature string (Fahrenheit)
-	getTemperatureF() {
-		return `${Math.round(this.tempF)}°F`
+	// Returns Formated Feels Like Temperature
+	getFeelsLike() {
+		return this.unit === "C"
+			? `${Math.round(this.feelsLikeC)}°C`
+			: `${Math.round(this.feelsLikeF)}°F`
+	}
+
+	// Returns Formated Heat Index
+	getHeatIndex() {
+		return this.unit === "C"
+			? `${Math.round(this.heatIndexC)}°C`
+			: `${Math.round(this.heatIndexF)}°F`
 	}
 
 	// Returns full description

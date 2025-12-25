@@ -11,6 +11,8 @@
 			<p class="text-2xl p-2 text-center">Weather Dashboard</p>
 		</header>
 		<main>
+			<p id="error" class="hidden text-red-500 mt-2"></p>
+
 			<section
 				id="search-form"
 				class="m-4 flex flex-col md:flex-row space-y-4 md:space-y-0"
@@ -30,6 +32,7 @@
 							class="p-1 rounded-lg w-9/12 mb:w-10/12 xs:w-11/12 border mx-auto mr-2"
 						/>
 						<input
+							id="search-city"
 							type="submit"
 							value="Search"
 							class="bg-emerald-400 rounded-lg px-2 flex-1 mx-auto"
@@ -43,15 +46,9 @@
 					<span class="flex p-2 space-x-2 justify-center">
 						<select
 							name="locations"
-							class="mx-auto p-0.5 w-10/12 border rounded-xl"
+							class="hidden mx-auto p-0.5 w-10/12 border rounded-xl"
 							id="searched_locations"
-						>
-							<option value="Mumbai">Mumbai</option>
-							<option value="Pune">Pune</option>
-							<option value="Chennai">Chennai</option>
-							<option value="Delhi">Delhi</option>
-							<option value="Hyderabad">Hyderabad</option>
-						</select>
+						></select>
 						<button
 							class="flex items-center rounded-full p-1 bg-violet-200 shadow-lg hover:bg-gray-300 ml-2"
 						>

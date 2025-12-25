@@ -46,6 +46,11 @@ export async function getWeather(city) {
 			// Temperature
 			tempC: data.current.temp_c,
 			tempF: data.current.temp_f,
+			feelsLikeC: data.current.feelslike_c,
+			feelsLikeF: data.current.feelslike_f,
+			heatIndexC: data.current.heatindex_c,
+			heatIndexF: data.current.heatindex_f,
+			uv: data.current.uv,
 
 			// Current
 			updated: data.current.last_updated,
@@ -56,13 +61,6 @@ export async function getWeather(city) {
 			icon: data.current.condition.icon,
 			humidity: data.current.humidity,
 			wind: data.current.wind_kph,
-
-			// Condition
-			feelsLikeC: data.current.feelslike_c,
-			feelsLikeF: data.current.feelslike_f,
-			heatIndexC: data.current.heatindex_c,
-			heatIndexF: data.current.heatindex_f,
-			uv: data.current.uv,
 		})
 
 		return {
