@@ -35,10 +35,6 @@ export async function getWeather(city) {
 			state: data.location.region,
 			country: data.location.country,
 
-			// Lat-Lon
-			lat: data.location.lat,
-			lon: data.location.lon,
-
 			// Date - Time
 			tz: data.location.tz_id,
 			time: data.location.localtime,

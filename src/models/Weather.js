@@ -3,8 +3,6 @@ export class Weather {
 		city,
 		state,
 		country,
-		lat,
-		lon,
 		tz,
 		time,
 		tempC,
@@ -20,12 +18,11 @@ export class Weather {
 		heatIndexC,
 		heatIndexF,
 		uv,
+		unit,
 	}) {
 		this.city = city
 		this.state = state
 		this.country = country
-		this.lat = lat
-		this.lon = lon
 		this.tz = tz
 		this.time = time
 		this.tempC = tempC
@@ -43,6 +40,10 @@ export class Weather {
 		this.heatIndexF = heatIndexF
 		this.uv = uv
 		this.unit = "C"
+	}
+
+	getC() {
+		return `${this.city}, ${this.getTemperature()}`
 	}
 
 	// Toggles C and F
@@ -78,6 +79,7 @@ export class Weather {
 		}${this.country}`
 	}
 
+	// Returns Formated
 	getFormattedTime() {
 		if (!this.time) return ""
 
@@ -85,6 +87,15 @@ export class Weather {
 		const [year, month, day] = date.split("-")
 
 		return `${time}, ${day}/${month}/${year.slice(2)}. ${this.tz}`
+	}
+
+	getFormattedUTime() {
+		if (!this.updated) return ""
+
+		const [date, time] = this.updated.split(" ")
+		const [year, month, day] = date.split("-")
+
+		return `${time}, ${day}/${month}/${year.slice(2)}.`
 	}
 
 	// Returns full icon URL

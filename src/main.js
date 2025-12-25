@@ -1,12 +1,24 @@
 import "./style.css"
+import { Weather } from "./models/Weather.js"
+import { getWeather } from "./services/WeatherService"
+import {
+	saveWeather,
+	getWeatherHistory,
+	getCurrentCity,
+	setCurrentCity,
+} from "./utils/WeatherStorage"
 
-import { getWeather } from "./services/weatherService.js"
-import { saveWeather, getWeatherHistory } from "./utils/WeatherStorage.js"
+import wind from "/icons/wind.png"
+import heat from "/icons/heat.png"
+import humidity from "/icons/humidity.png"
+import timezone from "/icons/timezone.png"
+import time from "/icons/time.png"
 
 /* -------------------------
    STATE
 ------------------------- */
-let weatherHistory = getWeatherHistory()
+let weatherHistory = getWeatherHistory().map((w) => new Weather(w)) // Wrap stored objects
+let currentWeather = null
 
 /* -------------------------
    DOM ELEMENTS
@@ -15,20 +27,47 @@ const select = document.getElementById("searched_locations")
 const searchCity = document.getElementById("search-city")
 const errorEl = document.getElementById("error")
 const description = document.getElementById("description")
+const toast = document.getElementById("toast")
+const toastMessage = document.getElementById("toast-message")
+const useLocationBtn = document.getElementById("use-location")
+const weatherIcon = document.getElementById("weather-icon")
+const toggleTemps = document.getElementById("toggle-temps")
+const box = document.getElementById("box")
+const loc = document.getElementById("loc")
 
 /* -------------------------
-   INIT
+   INITIALIZATION
 ------------------------- */
-populateLocationSelect(weatherHistory)
+const lastCity =
+	getCurrentCity() || (weatherHistory.length ? weatherHistory[0].city : null)
 
-// show select immediately if history exists
-if (weatherHistory.length > 0) {
-	select.classList.remove("hidden")
+populateLocationSelect(weatherHistory, lastCity)
+if (weatherHistory.length > 0) select.classList.remove("hidden")
+
+if (lastCity) {
+	const lastWeather = weatherHistory.find(
+		(w) => w.city.toLowerCase() === lastCity.toLowerCase()
+	)
+	if (lastWeather) renderWeather(lastWeather)
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+	if (!lastCity) displayWeatherFromLocation()
+})
+
 /* -------------------------
-   EVENTS
+   EVENT LISTENERS
 ------------------------- */
+toggleTemps.addEventListener("click", (e) => {
+	e.preventDefault()
+	toggleTemps.textContent = currentWeather.unit === "C" ? "°F" : "°C"
+	toggleTemps.classList.toggle("bg-yellow-400")
+	toggleTemps.classList.toggle("bg-gray-800")
+	if (!currentWeather) return
+	currentWeather.toggleUnit()
+	renderWeather(currentWeather)
+})
+
 searchCity.addEventListener("click", (e) => {
 	e.preventDefault()
 	displayWeather()
@@ -42,17 +81,20 @@ select.addEventListener("change", (e) => {
 	if (!weather) return
 
 	renderWeather(weather)
-	populateLocationSelect(weatherHistory, city) // keep it selected
+	setCurrentCity(city)
+	populateLocationSelect(weatherHistory, city)
 })
 
+if (useLocationBtn)
+	useLocationBtn.addEventListener("click", displayWeatherFromLocation)
+
 /* -------------------------
-   MAIN FUNCTION
+   MAIN FUNCTIONS
 ------------------------- */
 async function displayWeather(cityFromSelect) {
 	const cityInput = document.getElementById("weather-city")
 	const city = cityFromSelect || cityInput.value.trim()
 
-	// clear error
 	errorEl.classList.add("hidden")
 	errorEl.textContent = ""
 
@@ -61,42 +103,37 @@ async function displayWeather(cityFromSelect) {
 		return
 	}
 
-	/* -------------------------
-	   FROM SELECT (NO API)
-	------------------------- */
+	// CASE 1: From select
 	if (cityFromSelect) {
 		const cachedWeather = weatherHistory.find(
 			(w) => w.city.toLowerCase() === city.toLowerCase()
 		)
-
 		if (!cachedWeather) {
 			showToast("City not found in history", "error")
 			return
 		}
+
 		showToast("Weather updated successfully", "success")
 		renderWeather(cachedWeather)
+		setCurrentCity(city)
 		return
 	}
 
-	/* -------------------------
-	   FROM SEARCH (API)
-	------------------------- */
+	// CASE 2: From API
 	try {
-		console.log("making request")
 		const response = await getWeather(city)
-
 		if (!response.success) {
 			showToast(response.error, "error")
 			return
 		}
 
-		const weather = response.data
+		const weather = new Weather(response.data)
 		showToast("Weather updated successfully", "success")
-		// save & sync
+
 		saveWeather(weather)
+		setCurrentCity(city)
 		syncWeatherHistory()
 
-		// render UI
 		renderWeather(weather)
 	} catch (err) {
 		showToast("Something went wrong. Please try again.", "error")
@@ -104,47 +141,93 @@ async function displayWeather(cityFromSelect) {
 	}
 }
 
-/* -------------------------
-   HELPERS
-------------------------- */
-function renderWeather(weather) {
-	description.textContent = weather.status
+async function displayWeatherFromLocation() {
+	if (!navigator.geolocation) {
+		showToast("Geolocation is not supported by your browser", "error")
+		return
+	}
+
+	navigator.geolocation.getCurrentPosition(
+		async (position) => {
+			const { latitude, longitude } = position.coords
+			try {
+				const response = await getWeather(`${latitude},${longitude}`)
+				if (!response.success) {
+					showToast(response.error, "error")
+					return
+				}
+
+				const weather = new Weather(response.data)
+				showToast("Weather updated successfully", "success")
+
+				saveWeather(weather)
+				setCurrentCity(weather.city)
+				syncWeatherHistory()
+				renderWeather(weather)
+			} catch (err) {
+				showToast("Unable to fetch weather for your location", "error")
+				console.error(err)
+			}
+		},
+		(error) => {
+			showToast("Location access denied", "error")
+			console.warn(error)
+		}
+	)
 }
 
-//function populateLocationSelect(history) {
-//	select.innerHTML = ""
+/* -------------------------
+   HELPER FUNCTIONS
+------------------------- */
+function renderWeather(weather) {
+	currentWeather = weather
+	weatherIcon.src = weather.getIconUrl()
+	loc.innerHTML = `
+	<p class="flex">${weather.getC()}</p>
+	<p class="hidden sm:block ml-5 text-lg font-normal"> Feels like: ${weather.getFeelsLike()} </p>
+	`
+	box.innerHTML = `
+		<span class="inline-flex items-center space-x-2 mt-3">
+		<img src=${heat} class="size-6" alt="Heat Index" title="Heat Index">
+		<p>${weather.getHeatIndex()}</p>
+		</span>
+		<span class="inline-flex items-center space-x-2">
+		<img src=${humidity} class="size-6" alt="Humidity" title="Humidity">
+		<p>${weather.humidity}</p>
+		</span>
+		<span class="inline-flex items-center space-x-2">
+		<img src=${wind} class="size-6" alt="Wind" title="Wind">
+		<p>${weather.wind}</p>
+		</span>
+		<span class="inline-flex items-center space-x-2">
+		<img src=${time} class="size-6" alt="Updated" title="Updated">
+		<p>${weather.getFormattedUTime()}</p>
+		</span>
+		<span class="inline-flex items-center space-x-2">
+		<img src=${timezone} class="size-6" alt="Timezone" title="Timezone">
+		<p>${weather.tz}</p>
+		</span>		
+	`
 
-//	const defaultOption = document.createElement("option")
-//	defaultOption.textContent = "Select a city"
-//	defaultOption.disabled = true
-//	defaultOption.selected = true
-//	select.appendChild(defaultOption)
-
-//	history.forEach((item) => {
-//		const option = document.createElement("option")
-//		option.value = item.city
-//		option.textContent = `${item.city}, ${item.country}`
-//		select.appendChild(option)
-//	})
-//}
+	description.innerHTML = `
+		<p>${weather.status}</p>
+	`
+	checkWeatherAlerts(weather)
+}
 
 function populateLocationSelect(history, selectedCity = null) {
-	// Clear old options
 	select.innerHTML = ""
 
-	// Default placeholder
 	const defaultOption = document.createElement("option")
 	defaultOption.textContent = "Select a city"
 	defaultOption.disabled = true
-	defaultOption.selected = !selectedCity // select placeholder only if no city
+	defaultOption.selected = !selectedCity
 	select.appendChild(defaultOption)
 
-	// Populate cities
 	history.forEach((item) => {
 		const option = document.createElement("option")
 		option.value = item.city
 		option.textContent = `${item.city}, ${item.country}`
-		// Select current city
 		if (
 			selectedCity &&
 			item.city.toLowerCase() === selectedCity.toLowerCase()
@@ -156,61 +239,16 @@ function populateLocationSelect(history, selectedCity = null) {
 }
 
 function syncWeatherHistory() {
-	weatherHistory = getWeatherHistory()
-	populateLocationSelect(weatherHistory)
+	weatherHistory = getWeatherHistory().map((w) => new Weather(w))
+	const currentCity = getCurrentCity()
+	populateLocationSelect(weatherHistory, currentCity)
 	select.classList.toggle("hidden", weatherHistory.length === 0)
 }
 
-async function displayWeatherFromLocation() {
-	if (!navigator.geolocation) {
-		showToast("Geolocation is not supported by your browser", "error")
-		return
-	}
-	console.log("in")
-	navigator.geolocation.getCurrentPosition(
-		async (position) => {
-			const { latitude, longitude } = position.coords
-
-			try {
-				const response = await getWeather(`${latitude},${longitude}`)
-
-				if (!response.success) {
-					showToast(response.error, "error")
-					return
-				}
-
-				const weather = response.data
-				showToast("Weather updated successfully", "success")
-				// save & sync like normal search
-				saveWeather(weather)
-				syncWeatherHistory()
-				renderWeather(weather)
-			} catch (err) {
-				showToast("Weather updated successfully", "success")
-				console.error(err)
-			}
-		},
-		(error) => {
-			showToast("Weather updated successfully", "success")
-
-			console.warn(error)
-		}
-	)
-}
-
-document
-	.getElementById("use-location")
-	.addEventListener("click", displayWeatherFromLocation)
-
-const toast = document.getElementById("toast")
-const toastMessage = document.getElementById("toast-message")
-
 function showToast(message, type = "info") {
-	// Reset styles
 	toast.className =
 		"fixed top-4 right-4 z-50 max-w-sm rounded-xl px-4 py-3 text-sm text-white shadow-lg transition-all duration-300"
 
-	// Apply type-based colors
 	if (type === "success") toast.classList.add("bg-green-600")
 	if (type === "error") toast.classList.add("bg-red-600")
 	if (type === "info") toast.classList.add("bg-gray-900")
@@ -218,15 +256,26 @@ function showToast(message, type = "info") {
 	toastMessage.textContent = message
 	toast.classList.remove("hidden")
 
-	// Auto-hide after 3 seconds
 	setTimeout(() => {
 		toast.classList.add("hidden")
 	}, 3000)
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-	// Only auto-fetch if history is empty
-	if (weatherHistory.length === 0) {
-		displayWeatherFromLocation()
-	}
-})
+/* -------------------------
+   WEATHER ALERTS
+------------------------- */
+function checkWeatherAlerts(weather) {
+	if (!weather) return
+
+	const temp = weather.unit === "C" ? weather.tempC : weather.tempF
+	const highThreshold = weather.unit === "C" ? 40 : 104
+	const lowThreshold = weather.unit === "C" ? 0 : 32
+
+	if (temp >= highThreshold)
+		showToast("⚠️ Extreme heat! Stay hydrated.", "error")
+	if (temp <= lowThreshold) showToast("❄️ Extreme cold! Dress warmly.", "error")
+
+	const stormKeywords = ["storm", "thunder", "tornado", "hurricane"]
+	if (stormKeywords.some((k) => weather.status.toLowerCase().includes(k)))
+		showToast(`⚠️ Weather alert: ${weather.status}`, "error")
+}
