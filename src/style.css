@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+@layer theme {
+	@theme {
+		--breakpoint-mb: 320px; /* mobile */
+		--breakpoint-xs: 480px; /* tablet */
+		--breakpoint-sm: 640px; /* ipad */
+		--breakpoint-md: 768px; /* desktop-low */
+		--breakpoint-lg: 1024px; /* desktop-mid */
+		--breakpoint-xl: 1280px; /* desktop-high */
+	}
+}

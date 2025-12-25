@@ -15,10 +15,10 @@
 
 ## 🌐 Task 2: Weather API Integration (10 Marks)
 
-- Research and select a suitable Weather API
-- Generate and configure API key
-- Fetch weather data using JavaScript (`fetch` / `async-await`)
-- Handle API success and error responses properly
+- Research and select a suitable Weather API ✅
+- Generate and configure API key ✅
+- Fetch weather data using JavaScript (`fetch` / `async-await`) ✅
+- Handle API success and error responses properly ✅
 
 ---
 
@@ -26,17 +26,17 @@
 
 - Design a clean and intuitive UI using Tailwind CSS **(10 marks)**
 - Ensure responsive layout for:
-  - Desktop **(5 marks)**
-  - iPad Mini **(5 marks)**
-  - iPhone SE **(5 marks)**
-- Use a creative and original UI design (not copied)
+  - Desktop **(5 marks)** ✅
+  - iPad Mini **(5 marks)** ✅
+  - iPhone SE **(5 marks)** ✅
+- Use a creative and original UI design (not copied) ✅
 
 ---
 
 ## 📍 Task 4: Location-Based Weather Forecast (100 Marks)
 
 - Allow weather search by **city name** **(15 marks)**
-- Fetch weather using **current location** (Geolocation API) **(15 marks)**
+- Fetch weather using **current location** (Geolocation API) **(15 marks)** ✅
 - Add buttons and input fields for user interaction **(10 marks)**
 - Implement **recently searched cities dropdown**:
   - Store cities using local/session storage
