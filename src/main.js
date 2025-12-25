@@ -13,6 +13,7 @@ import heat from "/icons/heat.png"
 import humidity from "/icons/humidity.png"
 import timezone from "/icons/timezone.png"
 import time from "/icons/time.png"
+import temperature from "/icons/temperature.png"
 
 /* -------------------------
    STATE
@@ -34,6 +35,7 @@ const weatherIcon = document.getElementById("weather-icon")
 const toggleTemps = document.getElementById("toggle-temps")
 const box = document.getElementById("box")
 const loc = document.getElementById("loc")
+const forecast = document.getElementById("forecast")
 
 /* -------------------------
    INITIALIZATION
@@ -183,8 +185,9 @@ function renderWeather(weather) {
 	currentWeather = weather
 	weatherIcon.src = weather.getIconUrl()
 	loc.innerHTML = `
+	<span class="flex items-center">
 	<p class="flex">${weather.getC()}</p>
-	<p class="hidden sm:block ml-5 text-lg font-normal"> Feels like: ${weather.getFeelsLike()} </p>
+	<p class="hidden lg:block ml-5 text-lg font-normal"> Feels like: ${weather.getFeelsLike()} </p> </span>
 	`
 	box.innerHTML = `
 		<span class="inline-flex items-center space-x-2 mt-3">
@@ -212,6 +215,28 @@ function renderWeather(weather) {
 	description.innerHTML = `
 		<p>${weather.status}</p>
 	`
+
+	forecast.innerHTML = weather.forecast
+		.map((day) => {
+			const min = weather.unit === "C" ? day.minTempC : day.minTempF
+			const max = weather.unit === "C" ? day.maxTempC : day.maxTempF
+
+			return `
+			<article class="h-60 md:w-1/5 lg:w-1/6 space-x-5 border text-center flex flex-col items-center justify-center gap-2 rounded-lg shadow-sm bg-gray-200">
+				<p class="font-semibold">${day.date}</p>
+				<img src="https:${day.icon}" alt="${day.condition}" class="w-12 h-12" />
+				<p>${day.condition}</p>
+				<div class="flex items-center space-x-4">
+				<img src=${temperature} class="size-8">
+				<p class="font-medium">
+					${Math.round(max)}° / ${Math.round(min)}°
+				</p>
+				<p> </p>
+			</article>
+		`
+		})
+		.join("")
+
 	checkWeatherAlerts(weather)
 }
 
