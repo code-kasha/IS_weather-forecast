@@ -35,7 +35,14 @@ searchCity.addEventListener("click", (e) => {
 })
 
 select.addEventListener("change", (e) => {
-	displayWeather(e.target.value)
+	const city = e.target.value
+	const weather = weatherHistory.find(
+		(w) => w.city.toLowerCase() === city.toLowerCase()
+	)
+	if (!weather) return
+
+	renderWeather(weather)
+	populateLocationSelect(weatherHistory, city) // keep it selected
 })
 
 /* -------------------------
@@ -50,7 +57,7 @@ async function displayWeather(cityFromSelect) {
 	errorEl.textContent = ""
 
 	if (!city) {
-		showError("Please enter a city name")
+		showToast("Please enter a city name", "error")
 		return
 	}
 
@@ -63,10 +70,10 @@ async function displayWeather(cityFromSelect) {
 		)
 
 		if (!cachedWeather) {
-			showError("City not found in history")
+			showToast("City not found in history", "error")
 			return
 		}
-
+		showToast("Weather updated successfully", "success")
 		renderWeather(cachedWeather)
 		return
 	}
@@ -79,12 +86,12 @@ async function displayWeather(cityFromSelect) {
 		const response = await getWeather(city)
 
 		if (!response.success) {
-			showError(response.error)
+			showToast(response.error, "error")
 			return
 		}
 
 		const weather = response.data
-
+		showToast("Weather updated successfully", "success")
 		// save & sync
 		saveWeather(weather)
 		syncWeatherHistory()
@@ -92,7 +99,7 @@ async function displayWeather(cityFromSelect) {
 		// render UI
 		renderWeather(weather)
 	} catch (err) {
-		showError("Something went wrong. Please try again.")
+		showToast("Something went wrong. Please try again.", "error")
 		console.error(err)
 	}
 }
@@ -104,19 +111,46 @@ function renderWeather(weather) {
 	description.textContent = weather.status
 }
 
-function populateLocationSelect(history) {
+//function populateLocationSelect(history) {
+//	select.innerHTML = ""
+
+//	const defaultOption = document.createElement("option")
+//	defaultOption.textContent = "Select a city"
+//	defaultOption.disabled = true
+//	defaultOption.selected = true
+//	select.appendChild(defaultOption)
+
+//	history.forEach((item) => {
+//		const option = document.createElement("option")
+//		option.value = item.city
+//		option.textContent = `${item.city}, ${item.country}`
+//		select.appendChild(option)
+//	})
+//}
+
+function populateLocationSelect(history, selectedCity = null) {
+	// Clear old options
 	select.innerHTML = ""
 
+	// Default placeholder
 	const defaultOption = document.createElement("option")
 	defaultOption.textContent = "Select a city"
 	defaultOption.disabled = true
-	defaultOption.selected = true
+	defaultOption.selected = !selectedCity // select placeholder only if no city
 	select.appendChild(defaultOption)
 
+	// Populate cities
 	history.forEach((item) => {
 		const option = document.createElement("option")
 		option.value = item.city
 		option.textContent = `${item.city}, ${item.country}`
+		// Select current city
+		if (
+			selectedCity &&
+			item.city.toLowerCase() === selectedCity.toLowerCase()
+		) {
+			option.selected = true
+		}
 		select.appendChild(option)
 	})
 }
@@ -127,14 +161,9 @@ function syncWeatherHistory() {
 	select.classList.toggle("hidden", weatherHistory.length === 0)
 }
 
-function showError(message) {
-	errorEl.textContent = message
-	errorEl.classList.remove("hidden")
-}
-
 async function displayWeatherFromLocation() {
 	if (!navigator.geolocation) {
-		showError("Geolocation is not supported by your browser")
+		showToast("Geolocation is not supported by your browser", "error")
 		return
 	}
 	console.log("in")
@@ -146,23 +175,24 @@ async function displayWeatherFromLocation() {
 				const response = await getWeather(`${latitude},${longitude}`)
 
 				if (!response.success) {
-					showError(response.error)
+					showToast(response.error, "error")
 					return
 				}
 
 				const weather = response.data
-
+				showToast("Weather updated successfully", "success")
 				// save & sync like normal search
 				saveWeather(weather)
 				syncWeatherHistory()
 				renderWeather(weather)
 			} catch (err) {
-				showError("Unable to fetch weather for your location")
+				showToast("Weather updated successfully", "success")
 				console.error(err)
 			}
 		},
 		(error) => {
-			showError("Location access denied")
+			showToast("Weather updated successfully", "success")
+
 			console.warn(error)
 		}
 	)
@@ -171,3 +201,32 @@ async function displayWeatherFromLocation() {
 document
 	.getElementById("use-location")
 	.addEventListener("click", displayWeatherFromLocation)
+
+const toast = document.getElementById("toast")
+const toastMessage = document.getElementById("toast-message")
+
+function showToast(message, type = "info") {
+	// Reset styles
+	toast.className =
+		"fixed top-4 right-4 z-50 max-w-sm rounded-xl px-4 py-3 text-sm text-white shadow-lg transition-all duration-300"
+
+	// Apply type-based colors
+	if (type === "success") toast.classList.add("bg-green-600")
+	if (type === "error") toast.classList.add("bg-red-600")
+	if (type === "info") toast.classList.add("bg-gray-900")
+
+	toastMessage.textContent = message
+	toast.classList.remove("hidden")
+
+	// Auto-hide after 3 seconds
+	setTimeout(() => {
+		toast.classList.add("hidden")
+	}, 3000)
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+	// Only auto-fetch if history is empty
+	if (weatherHistory.length === 0) {
+		displayWeatherFromLocation()
+	}
+})
