@@ -4,12 +4,12 @@
 
 ## 🧱 Task 1: Project Setup & Version Control (5 Marks)
 
-- Create basic project structure (`index.html`, `style.css`, `script.js`)
-- Configure and use **Tailwind CSS**
-- Initialize Git repository
-- Create GitHub repository
+- Create basic project structure (`index.html`, `style.css`, `script.js`) ✅
+- Configure and use **Tailwind CSS** ✅
+- Initialize Git repository ✅
+- Create GitHub repository ✅
 - Write **at least 12 meaningful commits**
-- Commit HTML, CSS, JavaScript, and README separately
+- Commit HTML, CSS, JavaScript, and README separately ✅
 
 ---
 
