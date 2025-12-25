@@ -58,7 +58,7 @@ export class Weather {
 	}
 
 	/* -------------------------
-	   UNIT HANDLING
+		UNIT HANDLING
 	------------------------- */
 
 	getC() {
@@ -88,7 +88,7 @@ export class Weather {
 	}
 
 	/* -------------------------
-	   DESCRIPTION & TIME
+		DESCRIPTION & TIME
 	------------------------- */
 
 	getDescription() {
@@ -120,8 +120,7 @@ export class Weather {
 	}
 
 	/* -------------------------
-	   FORECAST HELPERS
-	   (Safe even if empty)
+		FORECAST HELPERS
 	------------------------- */
 
 	getForecast() {

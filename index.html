@@ -7,45 +7,30 @@
 		<title>Weather</title>
 	</head>
 	<body>
-		<header class="p-3 bg-emerald-400">
-			<p class="text-2xl p-2 text-center">Weather Dashboard</p>
+		<header>
+			<p class="site-title">Weather Dashboard</p>
 		</header>
 		<main>
-			<p id="error" class="hidden text-red-500 mt-2"></p>
-			<!-- Toast container -->
-			<div
-				id="toast"
-				class="fixed top-4 right-4 z-50 hidden max-w-sm rounded-xl bg-gray-900 px-4 py-3 text-sm text-white shadow-lg transition-all duration-300"
-			>
+			<p id="error"></p>
+			<div id="toast">
 				<p id="toast-message"></p>
 			</div>
 
-			<section class="m-4 flex flex-col md:flex-row space-y-4 md:space-y-0">
-				<!-- Panel -->
-				<div class="mb:w-full xs:w-10/12 space-y-2 mx-auto md:flex-1 md:mr-4">
-					<div class="p-4 mx-auto border flex space-x-3 lg:h-80">
-						<article class="w-1/2">
-							<div
-								id="loc"
-								class="flex items-center justify-center space-x-7 text-center text-lg sm:text-2xl font-semibold p-2 mx-auto"
-							></div>
-							<div id="box" class="flex flex-col space-y-4 mt-2 pl-3"></div>
+			<section class="panel-one">
+				<div class="panel-box">
+					<div class="article-box">
+						<article class="left-article">
+							<div id="loc" class="details-box"></div>
+							<div id="box" class="list-box"></div>
 						</article>
-						<article
-							class="flex-1 flex flex-col items-center justify-center space-y-2"
-						>
+						<article class="right-article">
 							<img id="weather-icon" class="mx-auto" />
 							<div id="description" class="text-center"></div>
-							<button
-								id="toggle-temps"
-								class="px-4 py-2 rounded-lg bg-gray-400 mt-2"
-							>
-								°C
-							</button>
+							<button id="toggle-temps" class="temp-switch">°C</button>
 						</article>
 					</div>
 				</div>
-				<!-- Weather Form -->
+
 				<form
 					id="weather-form"
 					class="flex flex-col border mb:w-full xs:w-10/12 md:w-5/12 lg:w-4/12 2xl:w-3/12 space-y-2 p-4 mx-auto md:mx-0"
@@ -94,14 +79,13 @@
 			</section>
 
 			<section>
-				<p class="text-center text-3xl p-4">5 Day Forecast</p>
-				<div
-					id="forecast"
-					class="grid grid-cols-2 sm:grid-cols-3 md:flex mx-auto justify-around items-center mt-3 p-2 gap-2"
-				></div>
+				<p class="forecast-title">5 Day Forecast</p>
+				<div id="forecast" class="forecast-grid"></div>
 			</section>
 		</main>
-		<footer></footer>
+		<footer>
+			<p class="footer-text">Akash Damle, 2025</p>
+		</footer>
 		<script type="module" src="/src/main.js"></script>
 	</body>
 </htmr>

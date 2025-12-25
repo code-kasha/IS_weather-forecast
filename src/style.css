@@ -10,3 +10,76 @@
 		--breakpoint-xl: 1280px; /* desktop-high */
 	}
 }
+
+@layer components {
+	header {
+		@apply p-3 bg-emerald-400;
+	}
+
+	.toast {
+		@apply fixed top-4 right-4 z-50 hidden max-w-sm rounded-xl bg-gray-900 px-4 py-3 text-sm text-white shadow-lg transition-all duration-300;
+	}
+
+	.site-title {
+		@apply text-2xl p-2 text-center;
+	}
+
+	.panel-one {
+		@apply m-4 flex flex-col md:flex-row space-y-4 md:space-y-0;
+	}
+
+	.panel-box {
+		@apply mb:w-full xs:w-10/12 space-y-2 mx-auto md:flex-1 md:mr-4;
+	}
+
+	.article-box {
+		@apply p-4 mx-auto border flex space-x-3 lg:h-80;
+	}
+
+	.left-article {
+		@apply w-1/2;
+	}
+
+	.details-box {
+		@apply flex items-center justify-center space-x-7 text-center text-lg sm:text-2xl font-semibold p-2 mx-auto;
+	}
+	.list-box {
+		@apply flex flex-col space-y-4 mt-2 pl-3;
+	}
+
+	.right-article {
+		@apply flex-1 flex flex-col items-center justify-center space-y-2;
+	}
+
+	.temp-switch {
+		@apply px-4 py-2 rounded-lg bg-gray-400 mt-2;
+	}
+
+	.forecast-title {
+		@apply text-center text-3xl p-4;
+	}
+
+	.forecast-grid {
+		@apply grid grid-cols-2 sm:grid-cols-3 md:flex mx-auto justify-around items-center mt-3 p-2 gap-2;
+	}
+
+	.loc-box {
+		@apply flex items-center;
+	}
+
+	.error {
+		@apply hidden text-red-500 mt-2;
+	}
+
+	.toast {
+		@apply fixed top-4 right-4 z-50 max-w-sm rounded-xl px-4 py-3 text-sm text-white shadow-lg transition-all duration-300;
+	}
+
+	footer {
+		@apply p-2 bg-emerald-400 bottom-0 w-full;
+	}
+
+	.footer-text {
+		@apply p-2 text-center text-xl;
+	}
+}

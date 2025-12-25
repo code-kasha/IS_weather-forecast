@@ -50,7 +50,7 @@ export function updateWeather(updatedWeather) {
 }
 
 /* -------------------------
-   CURRENT CITY
+	CURRENT CITY
 ------------------------- */
 
 /**

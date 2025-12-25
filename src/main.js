@@ -16,13 +16,13 @@ import time from "/icons/time.png"
 import temperature from "/icons/temperature.png"
 
 /* -------------------------
-   STATE
+	STATE
 ------------------------- */
 let weatherHistory = getWeatherHistory().map((w) => new Weather(w)) // Wrap stored objects
 let currentWeather = null
 
 /* -------------------------
-   DOM ELEMENTS
+	DOM ELEMENTS
 ------------------------- */
 const select = document.getElementById("searched_locations")
 const searchCity = document.getElementById("search-city")
@@ -38,7 +38,7 @@ const loc = document.getElementById("loc")
 const forecast = document.getElementById("forecast")
 
 /* -------------------------
-   INITIALIZATION
+	INITIALIZATION
 ------------------------- */
 const lastCity =
 	getCurrentCity() || (weatherHistory.length ? weatherHistory[0].city : null)
@@ -58,7 +58,7 @@ window.addEventListener("DOMContentLoaded", () => {
 })
 
 /* -------------------------
-   EVENT LISTENERS
+	EVENT LISTENERS
 ------------------------- */
 toggleTemps.addEventListener("click", (e) => {
 	e.preventDefault()
@@ -91,7 +91,7 @@ if (useLocationBtn)
 	useLocationBtn.addEventListener("click", displayWeatherFromLocation)
 
 /* -------------------------
-   MAIN FUNCTIONS
+	MAIN FUNCTIONS
 ------------------------- */
 async function displayWeather(cityFromSelect) {
 	const cityInput = document.getElementById("weather-city")
@@ -179,13 +179,13 @@ async function displayWeatherFromLocation() {
 }
 
 /* -------------------------
-   HELPER FUNCTIONS
+	HELPER FUNCTIONS
 ------------------------- */
 function renderWeather(weather) {
 	currentWeather = weather
 	weatherIcon.src = weather.getIconUrl()
 	loc.innerHTML = `
-	<span class="flex items-center">
+	<span class="loc-box">
 	<p class="flex">${weather.getC()}</p>
 	<p class="hidden lg:block ml-5 text-lg font-normal"> Feels like: ${weather.getFeelsLike()} </p> </span>
 	`
@@ -271,8 +271,7 @@ function syncWeatherHistory() {
 }
 
 function showToast(message, type = "info") {
-	toast.className =
-		"fixed top-4 right-4 z-50 max-w-sm rounded-xl px-4 py-3 text-sm text-white shadow-lg transition-all duration-300"
+	toast.className = "toast"
 
 	if (type === "success") toast.classList.add("bg-green-600")
 	if (type === "error") toast.classList.add("bg-red-600")
@@ -287,7 +286,7 @@ function showToast(message, type = "info") {
 }
 
 /* -------------------------
-   WEATHER ALERTS
+	WEATHER ALERTS
 ------------------------- */
 function checkWeatherAlerts(weather) {
 	if (!weather) return
